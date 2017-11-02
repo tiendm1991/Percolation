@@ -47,10 +47,10 @@ public class Percolation {
 			for(int j = col-1; j <= col+1; j++){
 				if(isValid(i, j)){
 					int neightbor = xyTo1D(i, j);
-					if(isOpen(i, j)) site[i-1][j-1] = 1;
-					else if (isFull(i, j)) {
+					if(isOpen(i, j)) {
 						quickUnion.union(checkPoint, neightbor);
-						if(site[i-1][j-1] != 2){
+						if(isFull(row, col) || isFull(i, j)){
+							site[row-1][col-1] = 2;
 							site[i-1][j-1] = 2;
 							fullNeightbor(i, j);
 						}
