@@ -4,30 +4,35 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
+	private static final double CONFIDENCE_95 = 1.96;
 	private final int n; // size of percolation
 	private final int trials; // number independent experiments
 	private final double[] results; // stores results of percolation experiments
-	private static final double CONFIDENCE_95 = 1.96;
+	private double mean, stddev; // stores mean and stdev
 
 	public PercolationStats(int n, int trials) {
+		if(n <= 0){
+			throw new IllegalArgumentException(n + "is invalid!");
+		}
+		if(trials <= 0){
+			throw new IllegalArgumentException(n + "is invalid!");
+		}
 		this.n = n;
 		this.trials = trials;
 		this.results = new double[trials];
 
 		for (int i = 0; i < trials; i++) {
 			Percolation per = new Percolation(n);
-			results[i] = initPercolation(i, per);
+			results[i] = initPercolation(per);
 		}
 	}
 
-	private double initPercolation(int i, Percolation per) {
+	private double initPercolation(Percolation per) {
 		int nbOpen = 0;
 		while (!per.percolates()) {
 			int r = StdRandom.uniform(1, n + 1);
 			int c = StdRandom.uniform(1, n + 1);
 			if (!per.isOpen(r, c)) {
-				// System.out.println("exp" + (i + 1) + ": " + "open (" + r +
-				// "," + c + ")");
 				per.open(r, c);
 				nbOpen++;
 			}
@@ -36,19 +41,21 @@ public class PercolationStats {
 	}
 
 	public double mean() {
-		return StdStats.mean(results);
+		mean = StdStats.mean(results);
+		return mean;
 	}
 
 	public double stddev() {
-		return StdStats.stddev(results);
+		stddev = StdStats.stddev(results);
+		return stddev;
 	}
 
 	public double confidenceLo() {
-		return mean() - CONFIDENCE_95 * stddev() / Math.sqrt(trials);
+		return mean - CONFIDENCE_95 * stddev / Math.sqrt(trials);
 	}
 
 	public double confidenceHi() {
-		return mean() + CONFIDENCE_95 * stddev() / Math.sqrt(trials);
+		return mean + CONFIDENCE_95 * stddev / Math.sqrt(trials);
 	}
 
 	public static void main(String[] args) {
