@@ -5,30 +5,33 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 	private final int n;
-	private boolean[][] site;
+	private int[][] site;
 	private final WeightedQuickUnionUF quickUnion;
+	private int nbOpen;
 
 	public Percolation(int n) {
-		if(n <= 0){
+		if (n <= 0) {
 			throw new IllegalArgumentException(n + "is invalid!");
 		}
 		this.n = n;
-		this.site = new boolean[n][n];
-		quickUnion = new WeightedQuickUnionUF(n * n);
+		this.site = new int[n][n];
+		this.quickUnion = new WeightedQuickUnionUF(n * n);
+		this.nbOpen = 0;
 	}
 
 	public boolean isOpen(int row, int col) {
 		checkValid(row, col);
-		return site[row - 1][col - 1];
+		return !isBlock(row, col);
 	}
 
 	public boolean isFull(int row, int col) {
 		checkValid(row, col);
-		if (row == 1 && isOpen(row, col))
+		if ((row == 1 && !isBlock(row, col)) || site[row - 1][col - 1] == 2)
 			return true;
 		int point = xyTo1D(row, col);
 		for (int i = 1; i <= n; i++) {
-			if (isOpen(1, i) && quickUnion.connected(point, i - 1)) {
+			if (!isBlock(1, i) && quickUnion.connected(point, i - 1)) {
+				site[row - 1][col - 1] = 2;
 				return true;
 			}
 		}
@@ -37,45 +40,42 @@ public class Percolation {
 
 	public void open(int row, int col) {
 		checkValid(row, col);
-		site[row - 1][col - 1] = true;
-		if (isValid(row, col - 1))
-			connect(row, col, row, col - 1);
-		if (isValid(row, col + 1))
-			connect(row, col, row, col + 1);
-		if (isValid(row - 1, col))
-			connect(row, col, row - 1, col);
-		if (isValid(row + 1, col))
-			connect(row, col, row + 1, col);
+		if (isBlock(row, col)) {
+			site[row - 1][col - 1] = 1;
+			nbOpen++;
+			if (isValid(row, col - 1))
+				connect(row, col, row, col - 1);
+			if (isValid(row, col + 1))
+				connect(row, col, row, col + 1);
+			if (isValid(row - 1, col))
+				connect(row, col, row - 1, col);
+			if (isValid(row + 1, col))
+				connect(row, col, row + 1, col);
+		}
+
 	}
 
 	public boolean percolates() {
 		for (int i = 1; i <= n; i++) {
-			if (isFull(n, i))
+			if (site[n - 1][i - 1] == 2)
 				return true;
 		}
 		return false;
 	}
 
 	public int numberOfOpenSites() {
-		int s = 0;
-		for (int i = 1; i <= n; i++) {
-			for (int j = 1; j <= n; j++) {
-				if (isOpen(i, j))
-					s++;
-			}
-		}
-		return s;
+		return nbOpen;
 	}
-	
-	private void checkValid(int row, int col){
+
+	private void checkValid(int row, int col) {
 		if (row < 1 || row > n)
 			throw new IllegalArgumentException(row + "outside its prescribed range");
 		if (col < 1 || col > n)
 			throw new IllegalArgumentException(col + "outside its prescribed range");
 	}
-	
+
 	private boolean isBlock(int row, int col) {
-		return !site[row - 1][col - 1];
+		return site[row - 1][col - 1] == 0;
 	}
 
 	private void connect(int r1, int c1, int r2, int c2) {
@@ -83,8 +83,12 @@ public class Percolation {
 			return;
 		int point1 = xyTo1D(r1, c1);
 		int point2 = xyTo1D(r2, c2);
-		if(!quickUnion.connected(point1, point2)){
+		if (!isBlock(r2, c2)) {
 			quickUnion.union(point1, point2);
+			if (isFull(r1, c1))
+				site[r2 - 1][c2 - 1] = 2;
+			if (isFull(r2, c2))
+				site[r1 - 1][c1 - 1] = 2;
 		}
 	}
 

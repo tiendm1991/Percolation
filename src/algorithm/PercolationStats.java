@@ -8,13 +8,13 @@ public class PercolationStats {
 	private final int n; // size of percolation
 	private final int trials; // number independent experiments
 	private final double[] results; // stores results of percolation experiments
-	private double mean, stddev; // stores mean and stdev
+	private Double mean, stddev; // stores mean and stdev
 
 	public PercolationStats(int n, int trials) {
-		if(n <= 0){
+		if (n <= 0) {
 			throw new IllegalArgumentException(n + "is invalid!");
 		}
-		if(trials <= 0){
+		if (trials <= 0) {
 			throw new IllegalArgumentException(n + "is invalid!");
 		}
 		this.n = n;
@@ -51,11 +51,13 @@ public class PercolationStats {
 	}
 
 	public double confidenceLo() {
-		return mean - CONFIDENCE_95 * stddev / Math.sqrt(trials);
+		return (mean == null ? mean() : mean)
+				- CONFIDENCE_95 * (stddev == null ? stddev() : stddev) / Math.sqrt(trials);
 	}
 
 	public double confidenceHi() {
-		return mean + CONFIDENCE_95 * stddev / Math.sqrt(trials);
+		return (mean == null ? mean() : mean)
+				+ CONFIDENCE_95 * (stddev == null ? stddev() : stddev) / Math.sqrt(trials);
 	}
 
 	public static void main(String[] args) {
