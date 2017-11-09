@@ -91,7 +91,7 @@ public class Percolation {
 	}
 
 	private void connect(int r1, int c1, int r2, int c2) {
-		if (isBlock(r2, c2) || isFull(r2, c2))
+		if (isBlock(r2, c2))
 			return;
 		int point1 = xyTo1D(r1, c1);
 		int point2 = xyTo1D(r2, c2);
