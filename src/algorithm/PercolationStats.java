@@ -28,14 +28,12 @@ public class PercolationStats {
 	}
 
 	private double initPercolation(Percolation per) {
-		int nbOpen = 0;
 		while (!per.percolates()) {
 			int r = StdRandom.uniform(1, n + 1);
 			int c = StdRandom.uniform(1, n + 1);
 			per.open(r, c);
-			nbOpen++;
 		}
-		return (double) nbOpen / (n * n);
+		return (double) per.numberOfOpenSites() / (n * n);
 	}
 
 	public double mean() {
