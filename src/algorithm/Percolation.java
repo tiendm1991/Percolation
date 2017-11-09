@@ -8,6 +8,7 @@ public class Percolation {
 	private int[][] site;
 	private final WeightedQuickUnionUF quickUnion;
 	private int nbOpen;
+	private boolean percolates;
 
 	public Percolation(int n) {
 		if (n <= 0) {
@@ -26,8 +27,10 @@ public class Percolation {
 
 	public boolean isFull(int row, int col) {
 		checkValid(row, col);
-		if ((row == 1 && !isBlock(row, col)) || site[row - 1][col - 1] == 2)
+		if ((row == 1 && !isBlock(row, col)) || site[row - 1][col - 1] == 2) {
+			site[row - 1][col - 1] = 2;
 			return true;
+		}
 		int point = xyTo1D(row, col);
 		for (int i = 1; i <= n; i++) {
 			if (!isBlock(1, i) && quickUnion.connected(point, i - 1)) {
@@ -42,6 +45,8 @@ public class Percolation {
 		checkValid(row, col);
 		if (isBlock(row, col)) {
 			site[row - 1][col - 1] = 1;
+			if (row == 1)
+				site[row - 1][col - 1] = 2;
 			nbOpen++;
 			if (isValid(row, col - 1))
 				connect(row, col, row, col - 1);
@@ -51,16 +56,23 @@ public class Percolation {
 				connect(row, col, row - 1, col);
 			if (isValid(row + 1, col))
 				connect(row, col, row + 1, col);
+			int point = xyTo1D(row, col);
+			if (isFull(row, col)) {
+				for (int j = 1; j <= n; j++) {
+					if (isValid(row, col - 1) && site[row-1][col-2] == 1) site[row-1][col-2] = 2;
+					if (isValid(row, col + 1) && site[row-1][col] == 1) site[row-1][col] = 2;
+					if (isValid(row - 1, col) && site[row-2][col-1] == 1) site[row-2][col-1] = 2;
+					if (isValid(row + 1, col) && site[row][col-1] == 1) site[row][col-1] = 2;
+					if (!percolates && !isBlock(n, j) && quickUnion.connected(point, n * (n - 1) + j - 1)) {
+						percolates = true;
+					}
+				}
+			}
 		}
-
 	}
 
 	public boolean percolates() {
-		for (int i = 1; i <= n; i++) {
-			if (site[n - 1][i - 1] == 2)
-				return true;
-		}
-		return false;
+		return percolates;
 	}
 
 	public int numberOfOpenSites() {
@@ -79,16 +91,12 @@ public class Percolation {
 	}
 
 	private void connect(int r1, int c1, int r2, int c2) {
-		if (isBlock(r2, c2))
+		if (isBlock(r2, c2) || isFull(r2, c2))
 			return;
 		int point1 = xyTo1D(r1, c1);
 		int point2 = xyTo1D(r2, c2);
-		if (!isBlock(r2, c2)) {
+		if(!quickUnion.connected(point1, point2)){
 			quickUnion.union(point1, point2);
-			if (isFull(r1, c1))
-				site[r2 - 1][c2 - 1] = 2;
-			if (isFull(r2, c2))
-				site[r1 - 1][c1 - 1] = 2;
 		}
 	}
 

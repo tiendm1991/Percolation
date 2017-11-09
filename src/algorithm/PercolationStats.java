@@ -32,10 +32,8 @@ public class PercolationStats {
 		while (!per.percolates()) {
 			int r = StdRandom.uniform(1, n + 1);
 			int c = StdRandom.uniform(1, n + 1);
-			if (!per.isOpen(r, c)) {
-				per.open(r, c);
-				nbOpen++;
-			}
+			per.open(r, c);
+			nbOpen++;
 		}
 		return (double) nbOpen / (n * n);
 	}
