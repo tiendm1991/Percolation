@@ -20,7 +20,6 @@ public class PercolationStats {
 		this.n = n;
 		this.trials = trials;
 		this.results = new double[trials];
-
 		for (int i = 0; i < trials; i++) {
 			Percolation per = new Percolation(n);
 			results[i] = initPercolation(per);

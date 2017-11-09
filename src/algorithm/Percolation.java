@@ -79,24 +79,24 @@ public class Percolation {
 	}
 
 	private void full(int row, int col) {
-		if(!fullMark[row-1][col-1]){
+		if (!fullMark[row - 1][col - 1]) {
 			fullMark[row - 1][col - 1] = true;
 			fullNeghbor(row, col);
 		}
-		
+
 	}
 
 	private void fullNeghbor(int row, int col) {
-		if (isValid(row, col - 1) && isOpen(row, col-1)) {
+		if (isValid(row, col - 1) && isOpen(row, col - 1)) {
 			fullMark[row - 1][col - 2] = true;
 		}
-		if (isValid(row, col + 1) && isOpen(row, col+1)) {
+		if (isValid(row, col + 1) && isOpen(row, col + 1)) {
 			fullMark[row - 1][col] = true;
 		}
-		if (isValid(row - 1, col) && isOpen(row-1, col)) {
+		if (isValid(row - 1, col) && isOpen(row - 1, col)) {
 			fullMark[row - 2][col - 1] = true;
 		}
-		if (isValid(row + 1, col) && isOpen(row+1, col)) {
+		if (isValid(row + 1, col) && isOpen(row + 1, col)) {
 			fullMark[row][col - 1] = true;
 		}
 	}
