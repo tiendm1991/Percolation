@@ -59,10 +59,14 @@ public class Percolation {
 			int point = xyTo1D(row, col);
 			if (isFull(row, col)) {
 				for (int j = 1; j <= n; j++) {
-					if (isValid(row, col - 1) && site[row-1][col-2] == 1) site[row-1][col-2] = 2;
-					if (isValid(row, col + 1) && site[row-1][col] == 1) site[row-1][col] = 2;
-					if (isValid(row - 1, col) && site[row-2][col-1] == 1) site[row-2][col-1] = 2;
-					if (isValid(row + 1, col) && site[row][col-1] == 1) site[row][col-1] = 2;
+					if (isValid(row, col - 1) && site[row - 1][col - 2] == 1)
+						site[row - 1][col - 2] = 2;
+					if (isValid(row, col + 1) && site[row - 1][col] == 1)
+						site[row - 1][col] = 2;
+					if (isValid(row - 1, col) && site[row - 2][col - 1] == 1)
+						site[row - 2][col - 1] = 2;
+					if (isValid(row + 1, col) && site[row][col - 1] == 1)
+						site[row][col - 1] = 2;
 					if (!percolates && !isBlock(n, j) && quickUnion.connected(point, n * (n - 1) + j - 1)) {
 						percolates = true;
 					}
@@ -95,7 +99,7 @@ public class Percolation {
 			return;
 		int point1 = xyTo1D(r1, c1);
 		int point2 = xyTo1D(r2, c2);
-		if(!quickUnion.connected(point1, point2)){
+		if (!quickUnion.connected(point1, point2)) {
 			quickUnion.union(point1, point2);
 		}
 	}
