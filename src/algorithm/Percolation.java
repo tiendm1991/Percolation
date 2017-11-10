@@ -7,7 +7,6 @@ public class Percolation {
 	private final int n;
 	private boolean[][] site;
 	private final WeightedQuickUnionUF quickUnion;
-	private final WeightedQuickUnionUF quickUnionFull;
 	private int nbOpen, topSite, bottomSite;
 
 	public Percolation(int n) {
@@ -17,7 +16,6 @@ public class Percolation {
 		this.n = n;
 		this.site = new boolean[n][n];
 		this.quickUnion = new WeightedQuickUnionUF(n * n);
-		this.quickUnionFull = new WeightedQuickUnionUF(n * n);
 		this.nbOpen = 0;
 		this.topSite = -1;
 		this.bottomSite = -1;
@@ -31,16 +29,11 @@ public class Percolation {
 	public boolean isFull(int row, int col) {
 		checkValid(row, col);
 		int point = xyTo1D(row, col);
-		if (isOpen(row, col) && quickUnionFull.find(point) != point) {
+		if (isOpen(row, col) && row == 1) {
 			return true;
 		}
-		int parentPoint = quickUnion.find(point);
-		for (int i = 1; i <= n; i++) {
-			if (isOpen(1, i) && quickUnion.find(i - 1) == parentPoint) {
-				full(row, col);
-				quickUnionFull.union(point, i - 1);
-				return true;
-			}
+		if (topSite != -1) {
+			return quickUnion.connected(point, topSite);
 		}
 		return false;
 	}
@@ -56,7 +49,6 @@ public class Percolation {
 				if (pre != -1) {
 					quickUnion.union(pre, topSite);
 				}
-				full(row, col);
 			}
 			if (row == n) {
 				int pre = bottomSite;
@@ -64,7 +56,6 @@ public class Percolation {
 				if (pre != -1) {
 					quickUnion.union(pre, bottomSite);
 				}
-				full(row, col);
 			}
 			nbOpen++;
 			if (isValid(row, col - 1))
@@ -81,33 +72,11 @@ public class Percolation {
 	public boolean percolates() {
 		if (topSite == -1 || bottomSite == -1)
 			return false;
-		System.out.println(quickUnion.find(topSite));
-		System.out.println(quickUnion.find(bottomSite));
 		return quickUnion.connected(topSite, bottomSite);
 	}
 
 	public int numberOfOpenSites() {
 		return nbOpen;
-	}
-
-	private void full(int row, int col) {
-		quickUnionFull.union(xyTo1D(row, col), col - 1);
-		fullNeghbor(row, col);
-	}
-
-	private void fullNeghbor(int row, int col) {
-		if (isValid(row, col - 1) && isOpen(row, col - 1)) {
-			quickUnionFull.union(xyTo1D(row, col - 1), col - 1);
-		}
-		if (isValid(row, col + 1) && isOpen(row, col + 1)) {
-			quickUnionFull.union(xyTo1D(row, col + 1), col - 1);
-		}
-		if (isValid(row - 1, col) && isOpen(row - 1, col)) {
-			quickUnionFull.union(xyTo1D(row - 1, col), col - 1);
-		}
-		if (isValid(row + 1, col) && isOpen(row + 1, col)) {
-			quickUnionFull.union(xyTo1D(row + 1, col), col - 1);
-		}
 	}
 
 	private void checkValid(int row, int col) {
